@@ -32,7 +32,9 @@ function sleep(seconds) {
      for (let i = 0; i < commands.length; i++) {
           try {
                await ps.invoke(commands[i])
-          } catch (error) {}
+          } catch (error) {
+               console.log("NUMBER"+i,error)
+          }
      }
      ps.dispose()
 
