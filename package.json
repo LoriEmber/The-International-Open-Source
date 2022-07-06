@@ -78,6 +78,8 @@
           "screeps": "4.2.14",
           "screeps-api": "1.16.0",
           "screepsmod-admin-utils": "1.29.0",
-          "screepsmod-auth": "2.6.2"
+          "screepsmod-auth": "2.6.2",
+          "fs": "0.0.1-security",
+          "node-powershell": "^5.0.1"
      }
 }
