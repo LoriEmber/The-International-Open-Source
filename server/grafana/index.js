@@ -24,9 +24,10 @@ const isMMoDestination = process.argv[2] === undefined
 
      const preStartDockerCommands = [
           'docker network create --driver bridge grafana',
-          'docker container stop grafana graphite',
+          'docker container stop grafana graphite push-statsd',
           'docker rm -f $(docker ps -a -q)',
           'docker volume rm $(docker volume ls -q)',
+          'docker build --quiet -t pushstatsd .'
      ]
 
      const commands = preStartDockerCommands.concat([
@@ -41,6 +42,7 @@ const isMMoDestination = process.argv[2] === undefined
       --network grafana \
       graphiteapp/graphite-statsd',
           `docker run -d --network grafana --name=grafana -p ${grafanaPort}:3000 -e "GF_AUTH_ANONYMOUS_ENABLED=true" grafana/grafana-oss:9.0.2-ubuntu`,
+          `docker container run -p 8080:8080 -it -d --network grafana -e "isMMoDestination=${isMMoDestination}" --name push-statsd pushstatsd`,
           'docker network connect bridge grafana',
      ])
      for (let i = 0; i < commands.length; i++) {

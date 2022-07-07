@@ -1,0 +1,10 @@
+{
+     "dependencies": {
+          "express": "*",
+          "lynx": "*",
+          "body-parser": "*"
+     },
+     "scripts": {
+          "start": "node push.js"
+     }
+}
