@@ -2,14 +2,16 @@ const axios = require('axios').default
 const fs = require('fs')
 const dashboard = require('./dashboard.js')
 const powerShell = require('node-powershell').PowerShell
+const { exec } = require("child_process");
 
 function sleep(seconds) {
      return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
    }
 
+
 ;(async function () {
      const ps = new powerShell({
-          executionPolicy: 'Bypass',
+          executionPolicy: 'Default',
           noProfile: true,
      })
 
@@ -31,7 +33,12 @@ function sleep(seconds) {
      ])
      for (let i = 0; i < commands.length; i++) {
           try {
-               await ps.invoke(commands[i])
+               exec(commands[i], (err, stdout, stderr) => {
+                    if (err) {
+                         console.log(err)
+                    }
+               })
+               // await ps.invoke(commands[i])
           } catch (error) {
                console.log("NUMBER"+i,error)
           }
