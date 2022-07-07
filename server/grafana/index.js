@@ -1,21 +1,33 @@
 const axios = require('axios').default
 const fs = require('fs')
-const dashboard = require('./dashboard.js')
+const privateDashboard = require('./privateDashboard.js')
+const mmoDashboard = require('./privateDashboard.js')
 const powerShell = require('node-powershell').PowerShell
-const { execSync } = require("child_process");
+const { execSync } = require('child_process')
+
+const isWindows = process.platform.includes('win')
 
 function sleep(seconds) {
-     return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-   }
+     return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+}
 
+const isMMoDestination = process.argv[2] === undefined
 
 ;(async function () {
-     // const ps = new powerShell({
-     //      executionPolicy: 'Default',
-     //      noProfile: true,
-     // })
+     let ps
+     if (isWindows)
+          ps = new powerShell({
+               executionPolicy: 'Default',
+               noProfile: true,
+          })
+     const grafanaPort = isWindows ? 4000 : 3000
 
-     const preStartDockerCommands = ['docker network create --driver bridge grafana','docker container stop grafana graphite','docker rm -f $(docker ps -a -q)','docker volume rm $(docker volume ls -q)']
+     const preStartDockerCommands = [
+          'docker network create --driver bridge grafana',
+          'docker container stop grafana graphite',
+          'docker rm -f $(docker ps -a -q)',
+          'docker volume rm $(docker volume ls -q)',
+     ]
 
      const commands = preStartDockerCommands.concat([
           'docker run -d \
@@ -28,27 +40,22 @@ function sleep(seconds) {
       -p 8126:8126 \
       --network grafana \
       graphiteapp/graphite-statsd',
-          'docker run -d --network grafana --name=grafana -p 3000:3000 grafana/grafana-oss:9.0.2-ubuntu',
+          `docker run -d --network grafana --name=grafana -p ${grafanaPort}:3000 -e "GF_AUTH_ANONYMOUS_ENABLED=true" grafana/grafana-oss:9.0.2-ubuntu`,
           'docker network connect bridge grafana',
      ])
      for (let i = 0; i < commands.length; i++) {
           try {
-               execSync(commands[i], (err, stdout, stderr) => {
-                    if (err) {
-                         console.log(err)
-                    }
-               })
-               // await ps.invoke(commands[i])
+               if (isWindows) await ps.invoke(commands[i])
+               else execSync(commands[i], (err, stdout, stderr) => {})
           } catch (error) {
-               console.log("NUMBER"+i,error)
+               console.log('NUMBER' + i, error)
           }
      }
      console.log('Pre setup done!')
-     // ps.dispose()
+     if (isWindows) ps.dispose()
 
-
-const grafanaUrl = 'http://localhost:3000'
-async function SetupDataSources() {
+     const grafanaUrl = 'http://localhost:' + grafanaPort
+     async function SetupDataSources() {
           try {
                await axios({
                     url: grafanaUrl + '/api/datasources',
@@ -77,13 +84,13 @@ async function SetupDataSources() {
                          username: 'admin',
                          password: 'admin',
                     },
-                    data: dashboard,
+                    data: isMMoDestination ? mmoDashboard : privateDashboard,
                })
           } catch (err) {
                console.log(err)
           }
      }
-     await sleep(30);
+     await sleep(30)
      await SetupDataSources()
      await SetupDashboard()
      console.log('Setup done!')

@@ -37,7 +37,7 @@ jobs:
                - name: Get IP
                  run: hostname -I
                - name: Start Grafana instance
-                 run: node server/grafana/index
+                 run: node server/grafana/index private
                - name: Execute server
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}

@@ -485,7 +485,7 @@ module.exports = {
             ]
         },
         "timezone": "",
-        "title": "CSR1 SLA Performance",
+        "title": "MMO",
         "version": 1
     }
 }
