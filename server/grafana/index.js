@@ -10,10 +10,10 @@ function sleep(seconds) {
 
 
 ;(async function () {
-     const ps = new powerShell({
-          executionPolicy: 'Default',
-          noProfile: true,
-     })
+     // const ps = new powerShell({
+     //      executionPolicy: 'Default',
+     //      noProfile: true,
+     // })
 
      const preStartDockerCommands = ['docker network create --driver bridge grafana','docker container stop grafana graphite','docker rm -f $(docker ps -a -q)','docker volume rm $(docker volume ls -q)']
 
@@ -43,7 +43,8 @@ function sleep(seconds) {
                console.log("NUMBER"+i,error)
           }
      }
-     ps.dispose()
+     console.log('Pre setup done!')
+     // ps.dispose()
 
 
 const grafanaUrl = 'http://localhost:3000'
@@ -78,12 +79,12 @@ async function SetupDataSources() {
                     },
                     data: dashboard,
                })
-          } catch (error) {
+          } catch (err) {
                console.log(err)
           }
      }
-     await sleep(5);
+     await sleep(30);
      await SetupDataSources()
      await SetupDashboard()
-     console.log('Done!')
+     console.log('Setup done!')
 })()
