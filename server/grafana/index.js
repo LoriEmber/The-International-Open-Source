@@ -2,7 +2,7 @@ const axios = require('axios').default
 const fs = require('fs')
 const dashboard = require('./dashboard.js')
 const powerShell = require('node-powershell').PowerShell
-const { exec } = require("child_process");
+const { execSync } = require("child_process");
 
 function sleep(seconds) {
      return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -33,7 +33,7 @@ function sleep(seconds) {
      ])
      for (let i = 0; i < commands.length; i++) {
           try {
-               exec(commands[i], (err, stdout, stderr) => {
+               execSync(commands[i], (err, stdout, stderr) => {
                     if (err) {
                          console.log(err)
                     }
