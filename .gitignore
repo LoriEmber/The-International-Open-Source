@@ -6,3 +6,4 @@ node_modules
 screeps.json
 .env
 .vs
+package-lock.json
